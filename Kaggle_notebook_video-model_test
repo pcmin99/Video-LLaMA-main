@@ -1,0 +1,217 @@
+{
+ "cells": [
+  {
+   "cell_type": "code",
+   "execution_count": 1,
+   "id": "4c539415",
+   "metadata": {
+    "_cell_guid": "b1076dfc-b9ad-4769-8c92-a6c4dae69d19",
+    "_uuid": "8f2839f25d086af736a60e9eeb907d3b93b6e0e5",
+    "execution": {
+     "iopub.execute_input": "2025-10-28T08:56:29.321635Z",
+     "iopub.status.busy": "2025-10-28T08:56:29.321389Z",
+     "iopub.status.idle": "2025-10-28T08:56:30.689351Z",
+     "shell.execute_reply": "2025-10-28T08:56:30.688772Z"
+    },
+    "papermill": {
+     "duration": 1.371679,
+     "end_time": "2025-10-28T08:56:30.690705",
+     "exception": false,
+     "start_time": "2025-10-28T08:56:29.319026",
+     "status": "completed"
+    },
+    "tags": []
+   },
+   "outputs": [],
+   "source": [
+    "# This Python 3 environment comes with many helpful analytics libraries installed\n",
+    "# It is defined by the kaggle/python Docker image: https://github.com/kaggle/docker-python\n",
+    "# For example, here's several helpful packages to load\n",
+    "\n",
+    "import numpy as np # linear algebra\n",
+    "import pandas as pd # data processing, CSV file I/O (e.g. pd.read_csv)\n",
+    "\n",
+    "# Input data files are available in the read-only \"../input/\" directory\n",
+    "# For example, running this (by clicking run or pressing Shift+Enter) will list all files under the input directory\n",
+    "\n",
+    "import os\n",
+    "for dirname, _, filenames in os.walk('/kaggle/input'):\n",
+    "    for filename in filenames:\n",
+    "        print(os.path.join(dirname, filename))\n",
+    "\n",
+    "# You can write up to 20GB to the current directory (/kaggle/working/) that gets preserved as output when you create a version using \"Save & Run All\" \n",
+    "# You can also write temporary files to /kaggle/temp/, but they won't be saved outside of the current session"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 2,
+   "id": "0be86cd9",
+   "metadata": {
+    "execution": {
+     "iopub.execute_input": "2025-10-28T08:56:30.695048Z",
+     "iopub.status.busy": "2025-10-28T08:56:30.694396Z",
+     "iopub.status.idle": "2025-10-28T08:58:26.860887Z",
+     "shell.execute_reply": "2025-10-28T08:58:26.859887Z"
+    },
+    "papermill": {
+     "duration": 116.169913,
+     "end_time": "2025-10-28T08:58:26.862430",
+     "exception": false,
+     "start_time": "2025-10-28T08:56:30.692517",
+     "status": "completed"
+    },
+    "tags": []
+   },
+   "outputs": [
+    {
+     "name": "stdout",
+     "output_type": "stream",
+     "text": [
+      "Found existing installation: torch 2.6.0+cu124\r\n",
+      "Uninstalling torch-2.6.0+cu124:\r\n",
+      "  Successfully uninstalled torch-2.6.0+cu124\r\n",
+      "Found existing installation: torchvision 0.21.0+cu124\r\n",
+      "Uninstalling torchvision-0.21.0+cu124:\r\n",
+      "  Successfully uninstalled torchvision-0.21.0+cu124\r\n",
+      "Found existing installation: torchaudio 2.6.0+cu124\r\n",
+      "Uninstalling torchaudio-2.6.0+cu124:\r\n",
+      "  Successfully uninstalled torchaudio-2.6.0+cu124\r\n",
+      "Looking in indexes: https://download.pytorch.org/whl/cu118\r\n",
+      "Collecting torch==2.1.2\r\n",
+      "  Downloading https://download.pytorch.org/whl/cu118/torch-2.1.2%2Bcu118-cp311-cp311-linux_x86_64.whl (2325.9 MB)\r\n",
+      "\u001b[2K     \u001b[90m━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\u001b[0m \u001b[32m2.3/2.3 GB\u001b[0m \u001b[31m377.1 kB/s\u001b[0m eta \u001b[36m0:00:00\u001b[0m\r\n",
+      "\u001b[?25hCollecting torchvision==0.16.2\r\n",
+      "  Downloading https://download.pytorch.org/whl/cu118/torchvision-0.16.2%2Bcu118-cp311-cp311-linux_x86_64.whl (6.1 MB)\r\n",
+      "\u001b[2K     \u001b[90m━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\u001b[0m \u001b[32m6.1/6.1 MB\u001b[0m \u001b[31m94.6 MB/s\u001b[0m eta \u001b[36m0:00:00\u001b[0m\r\n",
+      "\u001b[?25hCollecting torchaudio==2.1.2\r\n",
+      "  Downloading https://download.pytorch.org/whl/cu118/torchaudio-2.1.2%2Bcu118-cp311-cp311-linux_x86_64.whl (3.2 MB)\r\n",
+      "\u001b[2K     \u001b[90m━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\u001b[0m \u001b[32m3.2/3.2 MB\u001b[0m \u001b[31m86.5 MB/s\u001b[0m eta \u001b[36m0:00:00\u001b[0m\r\n",
+      "\u001b[?25hRequirement already satisfied: filelock in /usr/local/lib/python3.11/dist-packages (from torch==2.1.2) (3.19.1)\r\n",
+      "Requirement already satisfied: typing-extensions in /usr/local/lib/python3.11/dist-packages (from torch==2.1.2) (4.15.0)\r\n",
+      "Requirement already satisfied: sympy in /usr/local/lib/python3.11/dist-packages (from torch==2.1.2) (1.13.1)\r\n",
+      "Requirement already satisfied: networkx in /usr/local/lib/python3.11/dist-packages (from torch==2.1.2) (3.5)\r\n",
+      "Requirement already satisfied: jinja2 in /usr/local/lib/python3.11/dist-packages (from torch==2.1.2) (3.1.6)\r\n",
+      "Requirement already satisfied: fsspec in /usr/local/lib/python3.11/dist-packages (from torch==2.1.2) (2025.9.0)\r\n",
+      "Collecting triton==2.1.0 (from torch==2.1.2)\r\n",
+      "  Downloading https://download.pytorch.org/whl/triton-2.1.0-0-cp311-cp311-manylinux2014_x86_64.manylinux_2_17_x86_64.whl (89.2 MB)\r\n",
+      "\u001b[2K     \u001b[90m━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\u001b[0m \u001b[32m89.2/89.2 MB\u001b[0m \u001b[31m20.1 MB/s\u001b[0m eta \u001b[36m0:00:00\u001b[0m\r\n",
+      "\u001b[?25hRequirement already satisfied: numpy in /usr/local/lib/python3.11/dist-packages (from torchvision==0.16.2) (1.26.4)\r\n",
+      "Requirement already satisfied: requests in /usr/local/lib/python3.11/dist-packages (from torchvision==0.16.2) (2.32.5)\r\n",
+      "Requirement already satisfied: pillow!=8.3.*,>=5.3.0 in /usr/local/lib/python3.11/dist-packages (from torchvision==0.16.2) (11.3.0)\r\n",
+      "Requirement already satisfied: MarkupSafe>=2.0 in /usr/local/lib/python3.11/dist-packages (from jinja2->torch==2.1.2) (3.0.2)\r\n",
+      "Requirement already satisfied: mkl_fft in /usr/local/lib/python3.11/dist-packages (from numpy->torchvision==0.16.2) (1.3.8)\r\n",
+      "Requirement already satisfied: mkl_random in /usr/local/lib/python3.11/dist-packages (from numpy->torchvision==0.16.2) (1.2.4)\r\n",
+      "Requirement already satisfied: mkl_umath in /usr/local/lib/python3.11/dist-packages (from numpy->torchvision==0.16.2) (0.1.1)\r\n",
+      "Requirement already satisfied: mkl in /usr/local/lib/python3.11/dist-packages (from numpy->torchvision==0.16.2) (2025.2.0)\r\n",
+      "Requirement already satisfied: tbb4py in /usr/local/lib/python3.11/dist-packages (from numpy->torchvision==0.16.2) (2022.2.0)\r\n",
+      "Requirement already satisfied: mkl-service in /usr/local/lib/python3.11/dist-packages (from numpy->torchvision==0.16.2) (2.4.1)\r\n",
+      "Requirement already satisfied: charset_normalizer<4,>=2 in /usr/local/lib/python3.11/dist-packages (from requests->torchvision==0.16.2) (3.4.3)\r\n",
+      "Requirement already satisfied: idna<4,>=2.5 in /usr/local/lib/python3.11/dist-packages (from requests->torchvision==0.16.2) (3.10)\r\n",
+      "Requirement already satisfied: urllib3<3,>=1.21.1 in /usr/local/lib/python3.11/dist-packages (from requests->torchvision==0.16.2) (2.5.0)\r\n",
+      "Requirement already satisfied: certifi>=2017.4.17 in /usr/local/lib/python3.11/dist-packages (from requests->torchvision==0.16.2) (2025.8.3)\r\n",
+      "Requirement already satisfied: mpmath<1.4,>=1.1.0 in /usr/local/lib/python3.11/dist-packages (from sympy->torch==2.1.2) (1.3.0)\r\n",
+      "Requirement already satisfied: intel-openmp<2026,>=2024 in /usr/local/lib/python3.11/dist-packages (from mkl->numpy->torchvision==0.16.2) (2024.2.0)\r\n",
+      "Requirement already satisfied: tbb==2022.* in /usr/local/lib/python3.11/dist-packages (from mkl->numpy->torchvision==0.16.2) (2022.2.0)\r\n",
+      "Requirement already satisfied: tcmlib==1.* in /usr/local/lib/python3.11/dist-packages (from tbb==2022.*->mkl->numpy->torchvision==0.16.2) (1.4.0)\r\n",
+      "Requirement already satisfied: intel-cmplr-lib-rt in /usr/local/lib/python3.11/dist-packages (from mkl_umath->numpy->torchvision==0.16.2) (2024.2.0)\r\n",
+      "Requirement already satisfied: intel-cmplr-lib-ur==2024.2.0 in /usr/local/lib/python3.11/dist-packages (from intel-openmp<2026,>=2024->mkl->numpy->torchvision==0.16.2) (2024.2.0)\r\n",
+      "Installing collected packages: triton, torch, torchaudio, torchvision\r\n",
+      "  Attempting uninstall: triton\r\n",
+      "    Found existing installation: triton 3.2.0\r\n",
+      "    Uninstalling triton-3.2.0:\r\n",
+      "      Successfully uninstalled triton-3.2.0\r\n",
+      "Successfully installed torch-2.1.2+cu118 torchaudio-2.1.2+cu118 torchvision-0.16.2+cu118 triton-2.1.0\r\n"
+     ]
+    }
+   ],
+   "source": [
+    "!pip uninstall -y torch torchvision torchaudio\n",
+    "!pip install torch==2.1.2 torchvision==0.16.2 torchaudio==2.1.2 --index-url https://download.pytorch.org/whl/cu118\n"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 3,
+   "id": "ac3c5354",
+   "metadata": {
+    "execution": {
+     "iopub.execute_input": "2025-10-28T08:58:26.939243Z",
+     "iopub.status.busy": "2025-10-28T08:58:26.938942Z",
+     "iopub.status.idle": "2025-10-28T08:58:30.539886Z",
+     "shell.execute_reply": "2025-10-28T08:58:30.538947Z"
+    },
+    "papermill": {
+     "duration": 3.639897,
+     "end_time": "2025-10-28T08:58:30.541067",
+     "exception": false,
+     "start_time": "2025-10-28T08:58:26.901170",
+     "status": "completed"
+    },
+    "tags": []
+   },
+   "outputs": [
+    {
+     "name": "stdout",
+     "output_type": "stream",
+     "text": [
+      "Torch version: 2.1.2+cu118\n",
+      "Torch path: /usr/local/lib/python3.11/dist-packages/torch/__init__.py\n"
+     ]
+    }
+   ],
+   "source": [
+    "import torch\n",
+    "print(\"Torch version:\", torch.__version__)\n",
+    "print(\"Torch path:\", torch.__file__)\n"
+   ]
+  }
+ ],
+ "metadata": {
+  "kaggle": {
+   "accelerator": "nvidiaTeslaT4",
+   "dataSources": [
+    {
+     "sourceId": 271482571,
+     "sourceType": "kernelVersion"
+    }
+   ],
+   "dockerImageVersionId": 31154,
+   "isGpuEnabled": true,
+   "isInternetEnabled": true,
+   "language": "python",
+   "sourceType": "notebook"
+  },
+  "kernelspec": {
+   "display_name": "Python 3",
+   "language": "python",
+   "name": "python3"
+  },
+  "language_info": {
+   "codemirror_mode": {
+    "name": "ipython",
+    "version": 3
+   },
+   "file_extension": ".py",
+   "mimetype": "text/x-python",
+   "name": "python",
+   "nbconvert_exporter": "python",
+   "pygments_lexer": "ipython3",
+   "version": "3.11.13"
+  },
+  "papermill": {
+   "default_parameters": {},
+   "duration": 125.431729,
+   "end_time": "2025-10-28T08:58:31.297671",
+   "environment_variables": {},
+   "exception": null,
+   "input_path": "__notebook__.ipynb",
+   "output_path": "__notebook__.ipynb",
+   "parameters": {},
+   "start_time": "2025-10-28T08:56:25.865942",
+   "version": "2.6.0"
+  }
+ },
+ "nbformat": 4,
+ "nbformat_minor": 5
+}
